@@ -36,83 +36,48 @@ alt="Telegram"
             ></path>
         </svg>
     </a>
+import { useState } from 'react';
+import { Mail } from 'lucide-react';
 
-<!-- Button with Mail Icon -->
-<button
-  onclick="copyEmail()"
-  class="mx-3"
-  aria-label="Copy Email"
-  title="Copy Email"
-  style="background: none; border: none; cursor: pointer;"
->
-  <!-- Mail Icon (SVG) -->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path d="M12 13.065L.002 6.001v12h24v-12L12 13.065zM12 11L.002 4h23.996L12 11z"/>
-  </svg>
-</button>
+export default function EmailCopyButton() {
+  const [copied, setCopied] = useState(false);
+  const email = 'your-email@example.com'; // Replace with your actual email
 
-<!-- Popup Notification -->
-<div
-  id="mailPopup"
-  style="
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-family: sans-serif;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-  "
->
-  Mail copied
-</div>
+  const handleCopyEmail = () => {
+    // Copy email to clipboard
+    navigator.clipboard.writeText(email).then(() => {
+      // Show copied notification
+      setCopied(true);
+      
+      // Hide notification after 2 seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy email: ', err);
+    });
+  };
 
-<!-- JavaScript -->
-<script>
-  function copyEmail() {
-    const email = "your.email@example.com"; // <-- Replace with your email
-    if (navigator.clipboard && window.isSecureContext) {
-      // Use Clipboard API
-      navigator.clipboard.writeText(email).then(() => {
-        showPopup();
-      }).catch(err => {
-        console.error('Clipboard copy failed', err);
-      });
-    } else {
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = email;
-      textArea.style.position = "fixed";  // Prevent scrolling to bottom
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        showPopup();
-      } catch (err) {
-        console.error('Fallback: Copy command failed', err);
-      }
-      document.body.removeChild(textArea);
-    }
-  }
+  return (
+    <div className="relative">
+      <button 
+        onClick={handleCopyEmail}
+        className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors duration-200 flex items-center justify-center"
+        aria-label="Copy Email"
+      >
+        <Mail className="w-6 h-6" />
+      </button>
 
-  function showPopup() {
-    const popup = document.getElementById("mailPopup");
-    popup.style.display = "block";
-    setTimeout(() => {
-      popup.style.display = "none";
-    }, 2000);
-  }
-</script>
+      {copied && (
+        <div 
+          className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 
+                     bg-green-500 text-white text-sm px-3 py-2 rounded-md 
+                     shadow-lg transition-all duration-300 z-10"
+        >
+          Mail copied
+        </div>
+      )}
+    </div>
+  );
+}
 </div>
