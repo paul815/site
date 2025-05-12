@@ -36,57 +36,81 @@
         </svg>
     </a>
 
-<!-- Mail button -->
+<!-- Button with Mail Icon -->
 <button
-    onclick="copyEmail()"
-    class="mx-3"
-    aria-label="Email"
-    title="Copy email"
-    style="background: none; border: none; cursor: pointer;"
+  onclick="copyEmail()"
+  class="mx-3"
+  aria-label="Copy Email"
+  title="Copy Email"
+  style="background: none; border: none; cursor: pointer;"
 >
-    <!-- Mail icon (SVG) -->
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-    >
-        <path d="M12 13.065L.002 6.001v12h24v-12L12 13.065zM12 11L.002 4h23.996L12 11z"/>
-    </svg>
+  <!-- Mail Icon (SVG) -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="M12 13.065L.002 6.001v12h24v-12L12 13.065zM12 11L.002 4h23.996L12 11z"/>
+  </svg>
 </button>
 
-<!-- Popup message -->
+<!-- Popup Notification -->
 <div
-    id="mailPopup"
-    style="
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        display: none;
-        font-family: sans-serif;
-    "
+  id="mailPopup"
+  style="
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-family: sans-serif;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+  "
 >
-    Mail copied
+  Mail copied
 </div>
 
 <!-- JavaScript -->
 <script>
-function copyEmail() {
-    const email = "your.email@example.com"; // Replace with your actual email
-    navigator.clipboard.writeText(email).then(() => {
-        const popup = document.getElementById("mailPopup");
-        popup.style.display = "block";
-        setTimeout(() => {
-            popup.style.display = "none";
-        }, 2000); // Hide after 2 seconds
-    });
-}
-</script>
+  function copyEmail() {
+    const email = "your.email@example.com"; // <-- Replace with your email
+    if (navigator.clipboard && window.isSecureContext) {
+      // Use Clipboard API
+      navigator.clipboard.writeText(email).then(() => {
+        showPopup();
+      }).catch(err => {
+        console.error('Clipboard copy failed', err);
+      });
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = email;
+      textArea.style.position = "fixed";  // Prevent scrolling to bottom
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showPopup();
+      } catch (err) {
+        console.error('Fallback: Copy command failed', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  }
 
-</div>
+  function showPopup() {
+    const popup = document.getElementById("mailPopup");
+    popup.style.display = "block";
+    setTimeout(() => {
+      popup.style.display = "none";
+    }, 2000);
+  }
+</script>
